@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Student</title>
+        <script src="Scripts/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+        <center>
+            <input type="button" value="DisplayAll" onclick="displayAll()">
+            <input type="button" value="AddStudent" onclick="addStudent()">
+            <input type="button" value="FindbyRoll" onclick="findbyRoll()">
+            <input type="button" value="editClassDiv" onclick="edit()">
+            <input type="button" value="delete" onclick="deleteStudent()">
+            <input type="button" value="fetchByClass" onclick="fetchByClass()">
+            <input type="button" value="fetchByYear" onclick="fetchByYear()">
+            <div style="height: 100%;width: 1000px;" id="myDiv">
+            <h1>Students</h1>
+            Roll No : <input type="text" id="txtRoll"><br>
+            Name : <input type="text" id="txtName"><br>
+            class : <input type="text" id="txtClass"><br>
+            Division : <input type="text" id="txtDiv"><br>
+            DOB : <input type="text" id="txtDob"><br>
+            Mob No : <input type="text" id="txtMob"><br>
+            </div>
+        </center>
+        <script>
+            function displayAll(){
+                $.ajax({
+                    url : "http://127.0.0.1:9898/students",
+                    type : "GET",
+                    contentType : "application/json",
+                    success : function(students){
+                        students.map(function(student){
+                            $("#myDiv").append(getTemplate(student))
+                        });
+                    },
+                    error :function(err){
+                        alert("Something");
+                    }
+                })
+            }
+            function addStudent(){
+                var insertion = { "roll_no" : parseInt($("#txtRoll").val()),"name" : $("#txtName").val(),"class" : $("#txtClass").val(),
+                                "division" : $("#txtDiv").val(),"dob" : $("#txtDob").val(),"parent_mob_no" : parseInt($("#txtMob").val()),
+                };
+                $.ajax({
+                    url : "http://127.0.0.1:9898/students",
+                    type : "POST",
+                    contentType : "application/json",
+                    data : JSON.stringify(insertion),
+                    dataType : "json",
+                    success : function(result){
+                        if(result.affectedrows>0){
+                            alert("Success");
+                        }
+                    },
+                    error : function(err){
+                        alert("Something");
+                    }
+                });
+            }
+            function deleteStudent(){
+                $.ajax({
+                    url : "http://127.0.0.1:9898/students/"+ parseInt($("#txtRoll").val()),
+                    type : "DELETE",
+                    contentType : "application/json",
+                    success : function(result){
+                        if(result.affectedrows > 0){
+                            alert("Deleted");
+                        }
+                    },
+                    error : function(err){
+                        alert("Something");
+                    }
+                });
+            }
+            function edit(){
+                var insertion = {"class" : $("#txtClass").val(),
+                                "division" : $("#txtDiv").val()}
+                $.ajax({
+                    url : "http://127.0.0.1:9898/students/"+ parseInt($("#txtRoll").val()),
+                    type : "PUT",
+                    contentType : "application/json",
+                    data : JSON.stringify(insertion),
+                    dataType : "json",
+                    success : function(result){
+                        if(result.affectedrows > 0){
+                            alert("Inserted");
+                        }
+                    },
+                    error : function(err){
+                        alert("Something");
+                    }
+                });
+            }
+            function fetchByClass(){
+                $.ajax({
+                    url : "http://127.0.0.1:9898/studentsc/"+ ($("#txtClass").val()),
+                    type : "GET",
+                    contentType : "application/json",
+                    success : function(students){
+                        students.map(function(student){
+                            $("#myDiv").append(getTemplate(student))
+                        });
+                    },
+                    error : function(err){
+                        alert("Something");
+                    }
+                });
+            }
+            function findbyRoll(){
+                $.ajax({
+                    url : "http://127.0.0.1:9898/students/"+ parseInt($("#txtRoll").val()),
+                    type : "GET",
+                    contentType : "application/json",
+                    success : function(students){
+                        students.map(function(student){
+                            $("#myDiv").append(getTemplate(student))
+                        });
+                    },
+                    error : function(err){
+                        alert("Something");
+                    }
+                });
+            }
+            function fetchByYear(){
+                $.ajax({
+                    url : "http://127.0.0.1:9898/studentsb/"+ parseInt($("#txtDob").val()),
+                    type : "GET",
+                    contentType : "application/json",
+                    success : function(students){
+                        students.map(function(student){
+                            $("#myDiv").append(getTemplate(student))
+                        });
+                    },
+                    error : function(err){
+                        alert("Something");
+                    }
+                });
+            }
+            function getTemplate(student){
+                return `<table style="border:solid">
+                        <tr>
+                            <td>Roll : ${student.roll_no}</td>
+                            <td>Name : ${student.name}</td>
+                            <td>Class : ${student.class}</td>
+                            <td>Division : ${student.division}</td>
+                            <td>DOB : ${student.dob}</td>
+                            <td>Mobile : ${student.parent_mob_no}</td>
+                        </tr>
+                    </table>`
+            }
+        </script>
+    </body>
+</html>
